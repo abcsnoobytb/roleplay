@@ -3,10 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleplay</title>
+    <title>Roleplay Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #messages { width: 80%; margin: auto; border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+        input { width: 70%; padding: 8px; margin-top: 10px; }
+        button { padding: 8px; }
+    </style>
 </head>
 <body>
-    <h1>Chào mừng đến với Abc's Noob Roleplay!</h1>
-    <p>Trang web đang được phát triển...</p>
+    <h1>Roleplay Chat</h1>
+    <div id="messages"></div>
+    <input type="text" id="msgInput" placeholder="Nhập tin nhắn...">
+    <button onclick="sendMessage()">Gửi</button>
+
+    <script>
+        const API_URL = "https://28d82031-050b-4952-a7c8-32cfdbbcf13f-00-1zln17fuvabkb.pike.replit.dev:8080";
+
+        async function loadMessages() {
+            let res = await fetch(`${API_URL}/messages`);
+            let data = await res.json();
+            let chatBox = document.getElementById("messages");
+            chatBox.innerHTML = "";
+            data.forEach(msg => {
+                chatBox.innerHTML += `<p><b>${msg.user}:</b> ${msg.message}</p>`;
+            });
+        }
+
+        async function sendMessage() {
+            let msg = document.getElementById("msgInput").value;
+            if (!msg) return;
+
+            await fetch(`${API_URL}/send`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            });
+
+            document.getElementById("msgInput").value = "";
+            loadMessages();
+        }
+
+        setInterval(loadMessages, 3000);  // Cập nhật tin nhắn mỗi 3 giây
+        loadMessages();
+    </script>
 </body>
 </html>
